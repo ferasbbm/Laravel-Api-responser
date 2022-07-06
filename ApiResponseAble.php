@@ -26,7 +26,8 @@ trait ApiResponseAble
      */
     protected function createdResponse($data): JsonResponse
     {
-        $response = $this->successResponse(Response::HTTP_CREATED, $data, trans('api.ItemCreatedSuccessfully'));
+        $response = $this->successResponse(Response::HTTP_CREATED, $data,
+            trans('api.ItemCreatedSuccessfully'));
 
         return response()->json($response);
     }
@@ -54,7 +55,8 @@ trait ApiResponseAble
      */
     protected function deletedResponse(): JsonResponse
     {
-        $response = $this->successResponse(Response::HTTP_NO_CONTENT, [], trans('api.ItemDeletedSuccessfully'));
+        $response = $this->successResponse(Response::HTTP_NO_CONTENT, [],
+            trans('api.ItemDeletedSuccessfully'));
 
         return response()->json($response);
     }
@@ -109,7 +111,8 @@ trait ApiResponseAble
      */
     protected function unAuthenticatedResponse(): JsonResponse
     {
-        $response = $this->errorResponse(Response::HTTP_UNAUTHORIZED, null, trans('api.unAuthenticated'));
+        $response = $this->errorResponse(Response::HTTP_UNAUTHORIZED, null,
+            trans('api.unAuthenticated'));
 
         return response()->json($response);
     }
@@ -160,24 +163,24 @@ trait ApiResponseAble
     /**
      * Return error when request is properly formatted, but contains validation errors
      *
-     * @param $errors
+     * @param $errors_array
      *
      * @return JsonResponse
      * @author <ferasbbm>
      */
-    protected function validationErrorResponse($error): JsonResponse
+    protected function validationErrorResponse($errors_array): JsonResponse
     {
         $errors = [];
 
-        foreach ($error as $key => $value) {
-            $error_obj = collect($value);
-            $std = new \stdClass();
-            $std->field = $key;
-            $std->error = $error_obj->first();
-            $errors[] = $std;
+        foreach ($errors_array as $key => $value) {
+           $errors[] = [
+               'field' => $key,
+               'error' => $value[ 0 ],
+           ];
         }
 
-        $response = $this->errorResponse(Response::HTTP_UNPROCESSABLE_ENTITY, compact('errors'), trans('api.UnprocessableEntity'));
+        $response = $this->errorResponse(Response::HTTP_UNPROCESSABLE_ENTITY, compact('errors'),
+            trans('api.UnprocessableEntity'));
 
         return response()->json($response);
     }
@@ -192,7 +195,8 @@ trait ApiResponseAble
      * @return array
      * @author <ferasbbm>
      */
-    private function errorResponse(int $code = Response::HTTP_BAD_REQUEST, $errors = [], string $message = 'Bad Request'): array
+    private function errorResponse(int $code = Response::HTTP_BAD_REQUEST, $errors = [],
+        string $message = 'Bad Request'): array
     {
         $response = [
             'status' => false,
@@ -200,10 +204,9 @@ trait ApiResponseAble
             'message' => $message,
         ];
 
-        if (is_array($errors))
-            $response = array_merge($response, $errors);
-        else
-            $response[ 'errors' ] = $errors;
+        is_array($errors)
+            ? $response = array_merge($response, $errors)
+            : $response[ 'errors' ] = $errors;
 
         return $response;
     }
@@ -226,10 +229,9 @@ trait ApiResponseAble
             'message' => $message,
         ];
 
-        if (is_array($data))
-            $response = array_merge($response, $data);
-        else
-            $response[ 'data' ] = $data;
+        is_array($data)
+            ? $response = array_merge($response, $data)
+            : $response[ 'data' ] = $data;
 
         return $response;
     }
